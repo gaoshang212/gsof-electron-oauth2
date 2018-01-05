@@ -1,8 +1,9 @@
 import * as qs from 'querystring';
 import * as nurl from 'url';
 import * as _ from 'lodash';
-import * as request from 'request';
 import * as isJson from 'is-json'
+
+import { http } from "gsof-simple-async-http";
 
 export class oauth {
     private webview: any;
@@ -104,19 +105,11 @@ export class oauth {
             opts = Object.assign(opts, additionalToken);
         }
 
-        let promise = new Promise<any>((resolve, reject) => {
-            request(tokenUrl, { encoding: 'utf8', method: method, qs: opts, form: opts }, (err, res, body) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
+        let body = await http.text(tokenUrl, { method: method, params: opts });
 
-                let result = isJson(body) ? JSON.parse(body) : qs.parse(body);
-                resolve(result);
-            });
-        });
+        let result = isJson(body) ? JSON.parse(body) : qs.parse(body);
 
-        return promise;
+        return result;
     }
 
     private generateRandomString(length: number): string {

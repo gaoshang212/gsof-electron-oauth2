@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const qs = require("querystring");
 const nurl = require("url");
 const _ = require("lodash");
-const request = require("request");
 const isJson = require("is-json");
+const gsof_simple_async_http_1 = require("gsof-simple-async-http");
 class oauth {
     constructor(webview) {
         this.webview = webview;
@@ -83,17 +83,9 @@ class oauth {
         if (additionalToken) {
             opts = Object.assign(opts, additionalToken);
         }
-        let promise = new Promise((resolve, reject) => {
-            request(tokenUrl, { encoding: 'utf8', method: method, qs: opts, form: opts }, (err, res, body) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                let result = isJson(body) ? JSON.parse(body) : qs.parse(body);
-                resolve(result);
-            });
-        });
-        return promise;
+        let body = await gsof_simple_async_http_1.http.text(tokenUrl, { method: method, params: opts });
+        let result = isJson(body) ? JSON.parse(body) : qs.parse(body);
+        return result;
     }
     generateRandomString(length) {
         const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
