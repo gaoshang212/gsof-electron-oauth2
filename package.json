@@ -18,7 +18,7 @@
     "@types/node": "^8.0.16"
   },
   "dependencies": {
-    "gsof-simple-async-http": "^0.2.0",
+    "gsof-simple-async-http": "^0.2.1",
     "is-json": "^2.0.1",
     "lodash": "^4.17.4"
   }
