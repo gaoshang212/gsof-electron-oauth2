@@ -1,6 +1,5 @@
 import * as qs from 'querystring';
 import * as nurl from 'url';
-import * as _ from 'lodash';
 import * as isJson from 'is-json'
 
 import { http } from "gsof-simple-async-http";
@@ -19,7 +18,7 @@ export class oauth {
         }
 
         opts = opts || {};
-        opts = _.clone(opts);
+        opts = { ...opts };
 
         let authorizationUrl = opts.authorizationUrl
         if (authorizationUrl) {
@@ -56,23 +55,39 @@ export class oauth {
             };
 
             function callback(event, oldurl, newurl) {
-                if (!onparser(newurl || oldurl)) {
+                const url = newurl || oldurl;
+                if (!url.toLowerCase().startsWith(opts.redirect_uri)) {
                     return;
                 }
 
+                if (!onparser(url)) {
+                    return;
+                }
+
+                event && event.preventDefault();
+
                 webview.removeListener('will-navigate', callback);
-                webview.removeListener('did-get-redirect-request', callback);
+                //webview.removeListener('did-start-navigation', callback);
+                webview.removeListener('will-redirect', callback);
+
+                const electron = require('electron');
+                if (electron && webview.getType() === 'browserView') {
+                    const window = electron.remote.BrowserWindow.fromWebContents(webview);
+                    window && window.hide();
+                }
+
             };
 
             webview.on('will-navigate', callback);
-            webview.on('did-get-redirect-request', callback);
+            //webview.on('did-start-navigation', callback);
+            webview.on('will-redirect', callback);
         });
         return promise;
     }
 
     public async getAccessToken(opts) {
         opts = opts || {};
-        opts = _.clone(opts);
+        opts = { ...opts };
         let tokenUrl = opts.tokenUrl;
         let method = opts.method || 'get';
         let additionalToken = opts.additionalToken || {};

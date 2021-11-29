@@ -3,5 +3,5 @@ export declare class oauth {
     constructor(webview: any);
     getAuthorizationCode(opts: any): Promise<any>;
     getAccessToken(opts: any): Promise<any>;
-    private generateRandomString(length);
+    private generateRandomString;
 }

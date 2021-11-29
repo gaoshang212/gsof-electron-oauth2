@@ -1,6 +1,6 @@
 {
   "name": "gsof-electron-oauth2",
-  "version": "0.1.2",
+  "version": "0.2.1",
   "description": "a oauth2 library for Electron.",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -14,12 +14,10 @@
   "author": "gaoshang",
   "license": "MIT",
   "devDependencies": {
-    "@types/lodash": "^4.14.71",
     "@types/node": "^8.0.16"
   },
   "dependencies": {
     "gsof-simple-async-http": "^0.2.1",
-    "is-json": "^2.0.1",
-    "lodash": "^4.17.4"
+    "is-json": "^2.0.1"
   }
 }

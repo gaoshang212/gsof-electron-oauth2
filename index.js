@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const qs = require("querystring");
 const nurl = require("url");
-const _ = require("lodash");
 const isJson = require("is-json");
 const gsof_simple_async_http_1 = require("gsof-simple-async-http");
 class oauth {
@@ -15,7 +14,7 @@ class oauth {
             throw "the webview can be undefined or null.";
         }
         opts = opts || {};
-        opts = _.clone(opts);
+        opts = Object.assign({}, opts);
         let authorizationUrl = opts.authorizationUrl;
         if (authorizationUrl) {
             delete opts.authorizationUrl;
@@ -44,21 +43,33 @@ class oauth {
                 return error || code;
             };
             function callback(event, oldurl, newurl) {
-                if (!onparser(newurl || oldurl)) {
+                const url = newurl || oldurl;
+                if (!url.toLowerCase().startsWith(opts.redirect_uri)) {
                     return;
                 }
+                if (!onparser(url)) {
+                    return;
+                }
+                event && event.preventDefault();
                 webview.removeListener('will-navigate', callback);
-                webview.removeListener('did-get-redirect-request', callback);
+                //webview.removeListener('did-start-navigation', callback);
+                webview.removeListener('will-redirect', callback);
+                const electron = require('electron');
+                if (electron && webview.getType() === 'browserView') {
+                    const window = electron.remote.BrowserWindow.fromWebContents(webview);
+                    window && window.hide();
+                }
             }
             ;
             webview.on('will-navigate', callback);
-            webview.on('did-get-redirect-request', callback);
+            //webview.on('did-start-navigation', callback);
+            webview.on('will-redirect', callback);
         });
         return promise;
     }
     async getAccessToken(opts) {
         opts = opts || {};
-        opts = _.clone(opts);
+        opts = Object.assign({}, opts);
         let tokenUrl = opts.tokenUrl;
         let method = opts.method || 'get';
         let additionalToken = opts.additionalToken || {};
